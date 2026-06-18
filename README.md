@@ -80,6 +80,15 @@ The **visionOS app** is an Xcode app target (SwiftPM can't emit a visionOS `.app
 4. Foundation Models + App Intents need no extra entitlement, but require a device
    (or sim) with **Apple Intelligence** enabled to exercise `SiriAssistant`.
 
+## Companion-link contract
+
+Beyond the relay, the vendor-neutral
+[`GlassLink`](https://github.com/maceip/ambient-link-core/blob/main/contracts/GlassLink.swift)
+contract (copied here as `Sources/AmbientLinkKit/GlassLink.swift`) gives the Siri /
+App Intents layer and the RealityKit frontend one uniform capture/state surface.
+Full routing + performance plan: [ambient-link-core/ROUTING.md](https://github.com/maceip/ambient-link-core/blob/main/ROUTING.md),
+extracted from the recovered Cosmo teardown.
+
 ## Relay
 
 Reuses the existing Ambient Link relay (same one the Meta + Google apps read):
