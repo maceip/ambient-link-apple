@@ -1,4 +1,5 @@
 import AppIntents
+import AmbientLinkCore
 
 /// "Hey Siri, what are my agents doing?" — runs the on-device Foundation Models
 /// briefing and speaks/show the result, no app launch required.

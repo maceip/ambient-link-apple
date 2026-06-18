@@ -15,7 +15,7 @@ makes them conversational through **Apple Intelligence / Siri AI**.
 
 | Area | API | File |
 |---|---|---|
-| Relay client + model | `URLSession`, `@Observable` store | `Sources/AmbientLinkKit/{RelayClient,Session}.swift` |
+| Relay client + model | `URLSession`, `@Observable` store | shared in [`core-apple`](https://github.com/maceip/ambient-link-core/tree/main/core-apple) (`AmbientLinkCore`) |
 | **Siri AI / on-device LLM** | **Foundation Models** (`SystemLanguageModel`, `LanguageModelSession`, `@Generable`, `Tool`) | `Sources/AmbientLinkKit/SiriAssistant.swift` |
 | **Siri / Spotlight / Shortcuts** | **App Intents** (`AppEntity`, `AppIntent`, `AppShortcutsProvider`) | `Sources/AmbientLinkKit/Intents/*` |
 | **visionOS frontend** | SwiftUI + RealityKit (window, volumetric, ImmersiveSpace) | `App/AmbientLinkVision/*` |
@@ -46,15 +46,14 @@ Three scenes share one `SessionStore`:
 ## Layout
 
 ```
-Package.swift                              # AmbientLinkKit library (shared core)
+Package.swift                              # AmbientLinkKit; depends on ../ambient-link-core/core-apple
 Sources/AmbientLinkKit/
-  Session.swift                            # model + relay JSON decoding
-  RelayClient.swift                        # relay I/O + @Observable SessionStore
+  Exports.swift                            # @_exported import AmbientLinkCore (re-exports shared types)
   SiriAssistant.swift                      # Foundation Models session + Tool
   Intents/
     SessionEntity.swift                    # AppEntity + query
     Intents.swift                          # ShowSessions / ReplyToAgent / Shortcuts
-Tests/AmbientLinkKitTests/                 # swift test
+Tests/AmbientLinkKitTests/                 # swift test (kit surface; decode tests live in core-apple)
 App/AmbientLinkVision/                     # visionOS app target sources (add in Xcode)
   AmbientLinkApp.swift                     # @main: window + volume + ImmersiveSpace
   SessionListView.swift                    # primary window UI
@@ -82,10 +81,11 @@ The **visionOS app** is an Xcode app target (SwiftPM can't emit a visionOS `.app
 
 ## Companion-link contract
 
-Beyond the relay, the vendor-neutral
-[`GlassLink`](https://github.com/maceip/ambient-link-core/blob/main/contracts/GlassLink.swift)
-contract (copied here as `Sources/AmbientLinkKit/GlassLink.swift`) gives the Siri /
-App Intents layer and the RealityKit frontend one uniform capture/state surface.
+Beyond the relay, the vendor-neutral `GlassLink` contract — now shared via the
+**`AmbientLinkCore`** package ([core-apple](https://github.com/maceip/ambient-link-core/tree/main/core-apple))
+alongside `EphemeralBuffer` and `Throttle` — gives the Siri / App Intents layer and
+the RealityKit frontend one uniform capture/state surface. `AmbientLinkKit` depends
+on it via a local path dependency and re-exports it, so there are no in-repo copies.
 Full routing + performance plan: [ambient-link-core/ROUTING.md](https://github.com/maceip/ambient-link-core/blob/main/ROUTING.md),
 extracted from the recovered Cosmo teardown.
 

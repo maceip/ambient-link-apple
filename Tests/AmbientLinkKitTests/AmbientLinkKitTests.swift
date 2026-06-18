@@ -2,28 +2,28 @@ import Testing
 import Foundation
 @testable import AmbientLinkKit
 
-@Suite struct SessionDecoding {
-    @Test func parsesRelayStatusPayload() throws {
-        let json = """
-        { "sessions": [
-            { "session_id": "a1", "agent": "claude", "cwd": "/Users/me/proj", "state": "BUSY", "preview": "thinking" },
-            { "session_id": "b2", "agent": "codex", "cwd": "/Users/me/other", "state": "DEAD" }
-        ] }
-        """.data(using: .utf8)!
+// Session JSON decoding now lives in core-apple (AmbientLinkCoreTests). These tests
+// cover AmbientLinkKit's own surface and confirm it sees the shared core types via
+// the @_exported import.
 
-        let sessions = try Session.list(from: json)
-        #expect(sessions.count == 2)
-        #expect(sessions[0].agent == "claude")
-        #expect(sessions[0].state == .busy)
-        #expect(sessions[0].shortCwd == "proj")
-        #expect(sessions[0].isLive == true)
-        #expect(sessions[1].isLive == false)
+@Suite struct SessionEntityMapping {
+    @Test func mapsSessionFields() {
+        let s = Session(
+            sessionId: "a1", agent: "claude",
+            cwd: "/Users/me/proj", state: .busy, preview: "thinking"
+        )
+        let entity = SessionEntity(s)
+        #expect(entity.id == "a1")
+        #expect(entity.agent == "claude")
+        #expect(entity.cwd == "proj")        // shortCwd
+        #expect(entity.state == "BUSY")
+        #expect(entity.preview == "thinking")
     }
 
-    @Test func toleratesMissingFields() throws {
-        let json = #"{ "sessions": [ { "agent": "cursor" } ] }"#.data(using: .utf8)!
-        let sessions = try Session.list(from: json)
-        #expect(sessions.count == 1)
-        #expect(sessions[0].state == .idle)
+    @Test func sharedCoreTypesAreVisible() {
+        // Compiles only if the @_exported import surfaces the core types through the kit.
+        let s = Session(sessionId: "x", agent: "cursor", cwd: "/a/b", state: .idle)
+        #expect(s.isLive == true)
+        #expect(s.label == "cursor: b")
     }
 }

@@ -1,5 +1,6 @@
 import Foundation
 import FoundationModels
+import AmbientLinkCore
 
 /// Natural-language layer over Ambient Link, powered by the **Foundation Models
 /// framework** — the same on-device model that backs Apple Intelligence / Siri AI.

@@ -20,9 +20,17 @@ let package = Package(
     products: [
         .library(name: "AmbientLinkKit", targets: ["AmbientLinkKit"]),
     ],
+    dependencies: [
+        // Vendor-neutral core (Session/RelayClient/GlassLink/EphemeralBuffer/Throttle).
+        // Local path dep — requires ambient-link-core checked out as a sibling repo.
+        .package(path: "../ambient-link-core/core-apple"),
+    ],
     targets: [
         .target(
-            name: "AmbientLinkKit"
+            name: "AmbientLinkKit",
+            dependencies: [
+                .product(name: "AmbientLinkCore", package: "core-apple"),
+            ]
         ),
         .testTarget(
             name: "AmbientLinkKitTests",
